@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Una Carta Mágica para Ti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&family=Parisienne&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos Generales del Cuerpo */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(to bottom right, #ffc0cb, #ffe4e1); /* Degradado de rosa */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; /* Ocultar barras de desplazamiento por las estrellas */
+            color: #4a4a4a;
+        }
+
+        /* Contenedor principal de la Carta (sobre cerrado) */
+        .envelope-wrapper {
+            perspective: 1000px; /* Para el efecto 3D del sobre */
+            position: relative;
+            z-index: 2; /* Asegura que el sobre esté sobre las estrellas */
+        }
+
+        .envelope {
+            width: 300px;
+            height: 200px;
+            background-color: #ffb6c1; /* Rosa claro para el sobre */
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer; /* Indica que se puede hacer clic */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.8s ease-in-out, box-shadow 0.3s ease;
+        }
+
+        .envelope:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            transform: translateY(-5px); /* Pequeño levantamiento al pasar el ratón */
+        }
+
+        /* Tapa superior del sobre */
+        .envelope-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            background-color: #ff9ca8; /* Rosa un poco más oscuro */
+            transform-origin: top; /* Rota desde arriba */
+            transition: transform 0.8s ease-in-out;
+            z-index: 3; /* Para que esté por encima del contenido */
+        }
+
+        /* Texto frontal del sobre (ej. "Ábreme") */
+        .envelope-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-family: 'Parisienne', cursive;
+            font-size: 2em;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            z-index: 4; /* Sobre la tapa */
+            pointer-events: none; /* No bloquea el clic */
+        }
+
+        /* Contenido de la carta (inicialmente oculto) */
+        .card-content {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 40px; /* Aumentado el padding para más aire alrededor del texto */
+            box-sizing: border-box;
+            opacity: 0; /* Inicialmente invisible */
+            transform: translateY(20px); /* Ligeramente debajo */
+            transition: opacity 0.8s ease-in-out 0.4s, transform 0.8s ease-in-out 0.4s; /* Retardo para la aparición */
+            overflow-y: auto; /* Si el contenido es largo, permite desplazamiento */
+            max-height: calc(100% - 20px); /* Asegura que el contenido quepa sin desbordarse si el padding es grande */
+        }
+
+        /* Estilos del texto dentro de la carta */
+        .card-content h2 {
+            font-family: 'Parisienne', cursive;
+            color: #d85c8e;
+            font-size: 2.8em; /* Título un poco más grande */
+            text-align: center;
+            margin-bottom: 30px; /* Mayor espacio debajo del título */
+            line-height: 1.2; /* Espaciado de línea para el título */
+        }
+
+        .card-content p {
+            font-size: 1.05em; /* Ligeramente más grande para mejor lectura */
+            line-height: 1.9; /* Mayor espacio entre líneas para más aire */
+            text-align: justify; /* Justificado para una apariencia limpia */
+            margin-bottom: 1.8em; /* Más espacio entre párrafos */
+            text-indent: 40px; /* Sangría más pronunciada para inicio de párrafo */
+        }
+
+        .card-content .signature {
+            font-family: 'Parisienne', cursive;
+            font-size: 2.2em; /* Firma más grande y destacada */
+            color: #db206b;
+            text-align: right;
+            margin-top: 40px; /* Mayor espacio encima de la firma */
+        }
+
+        /* Estado "abierto" del sobre */
+        .envelope.open .envelope-top {
+            transform: rotateX(180deg); /* La tapa se abre hacia atrás */
+            z-index: 1; /* Para que el contenido quede por encima */
+        }
+
+        .envelope.open .card-content {
+            opacity: 1; /* Hacer visible el contenido */
+            transform: translateY(0); /* Mover a su posición final */
+        }
+
+        .envelope.open .envelope-text {
+            opacity: 0; /* Ocultar el texto "Ábreme" */
+            transition: opacity 0.3s ease-out;
+        }
+
+        /* Estrellas Cayendo (efecto de fondo) */
+        .star {
+            position: absolute;
+            background-color: #fff; /* Estrellas blancas */
+            border-radius: 50%;
+            opacity: 0; /* Inicialmente invisibles */
+            animation: fall 10s linear infinite; /* Animación de caída */
+            z-index: 1; /* Detrás del sobre */
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) translateX(50px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="envelope-wrapper">
+        <div class="envelope" id="cartaSobre">
+            <div class="envelope-top"></div>
+            <div class="envelope-text">¡Ábreme!</div>
+            <div class="card-content">
+                <h2 style="font-size:1em; letter-spacing:0.5px; margin-bottom:12px; font-family:'Parisienne',cursive; color:#d85c8e; text-align:center;">
+                    Esto es un detallito pa mi odiosita 
+                </h2>
+                <p style="font-size:0.98em; line-height:1.5; text-align:center; margin:0;">
+                    Recuérdate que eres una chica muy especial para mí y, como prometí, siempre voy a cuidarte y apoyarte.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para abrir la carta
+        document.getElementById('cartaSobre').addEventListener('click', function() {
+            this.classList.toggle('open');
+        });
+
+        // Función para crear estrellas cayendo
+        function createStar() {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            document.body.appendChild(star);
+
+            // Tamaño aleatorio de la estrella
+            const size = Math.random() * 5 + 2; // entre 2 y 7px
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+
+            // Posición inicial aleatoria en la parte superior
+            star.style.left = `${Math.random() * 100}vw`;
+
+            // Duración de la animación aleatoria
+            star.style.animationDuration = `${Math.random() * 5 + 5}s`; // entre 5 y 10 segundos
+            star.style.animationDelay = `${Math.random() * -10}s`; // retraso negativo para que aparezcan desde el inicio
+
+            // Eliminar la estrella cuando termina la animación para no saturar el DOM
+            star.addEventListener('animationend', () => {
+                star.remove();
+            });
+        }
+
+        // Crear estrellas continuamente
+        setInterval(createStar, 300); // Crea una estrella cada 300 milisegundos
+    </script>
+</body>
+</html>
